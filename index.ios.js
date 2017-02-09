@@ -12,6 +12,7 @@ import { Dispatcher } from 'flux';
 import {
   AppRegistry,
   StyleSheet,
+  Text,
   View,
   ListView,
 } from 'react-native';
@@ -135,4 +136,4 @@ const styles = StyleSheet.create({
   },
 });
 
-AppRegistry.registerComponent('FluxTodo', () => FluxTodo);
+AppRegistry.registerComponent('MainSection', () => MainSection);
