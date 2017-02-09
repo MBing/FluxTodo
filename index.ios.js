@@ -135,9 +135,9 @@ export default class FluxTodo extends Component {
       <View style={styles.container}>
         <ListView
           dataSource={this.state.dataSource}
-          renderRow={(todo, index) => (
-                    <ProjectsListItem
-                        key={index}
+          renderRow={todo => (
+                    <TodoItem
+                        key={todo.id}
                         todo={todo}
                     />
                 )}
