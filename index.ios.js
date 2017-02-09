@@ -152,8 +152,12 @@ FluxTodo.PropTypes = {
 };
 
 export class TodoItem extends Component {
+  constructor(props) {
+    super(props);
+  }
+
   render() {
-    let todo = this.props.todo;
+    let { todo } = this.props;
     let todoItemStyle;
     todoItemStyle = (todo.complete) ? styles.TodoItemDone : styles.TodoItem;
     return (
