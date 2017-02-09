@@ -99,41 +99,156 @@ AppDispatcher.register(action => {
       destroy(action.id);
       TodoStore.emitChange();
       break;
-    default;
+    default:
   }
 });
 
-export default class MainSection extends Component {
+export default class FluxTodo extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      dataSource: new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 }),
+    };
+  }
+
+  componentDidMount() {
+    this.updateList();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props !== prevProps) {
+      this.updateList();
+    }
+  }
+
+  updateList() {
+    const { todos } = this.props;
+
+    this.setState({
+      dataSource: this.state.dataSource.cloneWithRows(todos),
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <ListView dataSource={this.props.todos} renderRow={this.renderItem} />
+        <ListView
+          dataSource={this.state.dataSource}
+          renderRow={(todo, index) => (
+                    <ProjectsListItem
+                        key={index}
+                        todo={todo}
+                    />
+                )}
+        />
       </View>
     );
   }
 }
 
-MainSection.PropTypes = {
+FluxTodo.PropTypes = {
   todos: PropTypes.object.isRequired,
 };
 
+export class TodoItem extends Component {
+  render() {
+    let todo = this.props.todo;
+    let todoItemStyle;
+    todoItemStyle = (todo.complete) ? styles.TodoItemDone : styles.TodoItem;
+    return (
+      <View style={todoItemStyle}>
+        <Text style={styles.text}>{todo.text}</Text>
+        <Text onPress={() => this._onToggleComplete(todo)}>[Complete]</Text>
+        <Text onPress={() => this._onDestroy(todo)}>[Delete]</Text>
+      </View>
+    );
+  }
+
+  _onToggleComplete(todo) {
+    TodoActions.toggleComplete(todo);
+  }
+
+  _onDestroy(todo) {
+    TodoActions.destroy(todo.id);
+  }
+}
+
+export class Header extends Component {
+  render() {
+    return (
+      <View>
+        <TodoTextInput />
+      </View>
+    )
+  }
+}
+
+export class TodoTextInput extends Component {
+  getInitialState() {
+    return {
+      value: '',
+    };
+  }
+
+  render() {
+    return (
+      <View>
+        <TextInput
+          style={styles.TodoTextInput}
+          onChangeText={text => this.setState({value: text})}
+          onBlur={this._save}
+          placeholder={'What needs to be done?'}
+          value={this.state.value}
+        />
+      </View>
+    )
+  }
+
+  _save() {
+    let text = this.state.value;
+    if (text) {
+      TodoActions.create(text);
+      this.setState({
+        value: '',
+      })
+    }
+  }
+};
+
 const styles = StyleSheet.create({
-  container: {
+  TodoApp: {
+    padding: 20,
+    paddingTop: 40,
+  },
+  TodoItem: {
     flex: 1,
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#FFFFFF',
+    height: 58,
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+  TodoItemDone: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    height: 58,
+    opacity: .3,
   },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
+  text: {
+    flex: 1,
+    textAlign: 'left',
+    fontSize: 16,
+  },
+  TodoTextInput: {
+    height: 40,
+    backgroundColor: '#EEEEEE',
+    padding: 10,
+    fontSize: 16,
   },
 });
 
-AppRegistry.registerComponent('MainSection', () => MainSection);
+AppRegistry.registerComponent('FluxTodo', () => FluxTodo);
