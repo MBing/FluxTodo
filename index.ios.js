@@ -67,7 +67,7 @@ function create(text) {
 }
 
 function update(id, updates) {
-  _todos[id] = assign({}, _todos[id], updates);
+  _todos[id] = Object.assign({}, _todos[id], updates);
 }
 
 function destroy(id) {
@@ -75,7 +75,14 @@ function destroy(id) {
 }
 
 let TodoStore = Object.assign({}, EventEmitter.prototype, {
-  getAll: () => _todos.slice(),
+  getAll: () => {
+    var todos = [];
+    for (let key in _todos) {
+      todos.push(key);
+      // _todos.slice();
+    }
+    return todos;
+  },
   emitChange: () => this.emit(CHANGE_EVENT),
   addChangeListener: callback => this.on(CHANGE_EVENT, callback),
   removeChangeListener: callback => this.removeListener(CHANGE_EVENT, callback),
@@ -93,6 +100,10 @@ AppDispatcher.register(action => {
       break;
     case TodoConstants.TODO_UNDO_COMPLETE:
       update(action.id, {complete: false});
+      TodoStore.emitChange();
+      break;
+    case TodoConstants.TODO_COMPLETE:
+      update(action.id, {complete: true});
       TodoStore.emitChange();
       break;
     case TodoConstants.TODO_DESTROY:
@@ -123,6 +134,7 @@ export default class FluxTodo extends Component {
   }
 
   updateList() {
+    console.log(this.props);
     const { todos } = this.props;
 
     this.setState({
