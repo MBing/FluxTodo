@@ -201,8 +201,10 @@ export class Header extends Component {
 }
 
 export class TodoTextInput extends Component {
-  getInitialState() {
-    return {
+  constructor(props) {
+    super(props);
+
+    this.state = {
       value: '',
     };
   }
